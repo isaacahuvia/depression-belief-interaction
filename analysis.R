@@ -2,8 +2,6 @@
 ##  Sample Code  ##
 ###################
 
-#add comment
-
 ####  Startup  ####
 ## Load packages
 library(tidyverse)
