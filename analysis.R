@@ -8,7 +8,7 @@ library(tidyverse)
 library(assertr)
 library(here)
 
-
+#comment
 
 ####  Load Data  ####
 # The here() package returns filepaths based on the arguments you give it,
@@ -23,9 +23,6 @@ df <- readRDS(here("data", "T2T Data for Jans et al.rds"))
 ####  Prepare Data  ####
 df <- df %>%
   
-  # Rename variables
-  rename(id = yb_lsmh_id) %>%
-  
   # Create new variables
   mutate(race_recoded = "...") %>%
   
@@ -38,8 +35,9 @@ df <- df %>%
 
 
 ####  Analysis  ####
-## Correlations
-cor.test(df$yb_cdi_1, df$yb_cdi_2, method = "spearman")
+## Regression
+my_model <- lm(data = df, yb_cdi_1 ~ yb_cdi_2 + yb_cdi_3)
+summary(my_model)
 
 
 ## Plots
