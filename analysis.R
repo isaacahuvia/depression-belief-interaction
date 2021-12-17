@@ -4,11 +4,14 @@
 
 ####  Startup  ####
 ## Load packages
+
+if(!require(tidyverse)){install.packages('tidyverse')}
+if(!require(assertr)){install.packages('assertr')}
+if(!require(here)){install.packages('here')}
+
 library(tidyverse)
 library(assertr)
 library(here)
-
-#test3
 
 ####  Load Data  ####
 # The here() package returns filepaths based on the arguments you give it,
@@ -16,7 +19,9 @@ library(here)
 # the filepath to the dataset inside the "data" folder
 # This is especially useful when a script will be run on Windows and Mac 
 # computers, as they use different folder separators ("/" vs "\")
+
 df <- readRDS(here("data", "T2T Data for Jans et al.rds"))
+str(df)
 
 
 
