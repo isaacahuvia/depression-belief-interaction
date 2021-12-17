@@ -4,6 +4,10 @@
 
 ####  Startup  ####
 ## Load packages
+if(!require(tidyverse)){install.packages('tidyverse')}
+if(!require(assertr)){install.packages('assertr')}
+if(!require(here)){install.packages('here')}
+
 library(tidyverse)
 library(assertr)
 library(here)
@@ -17,14 +21,12 @@ library(here)
 # This is especially useful when a script will be run on Windows and Mac 
 # computers, as they use different folder separators ("/" vs "\")
 df <- readRDS(here("data", "T2T Data for Jans et al.rds"))
+str(df)
 
 
 
 ####  Prepare Data  ####
 df <- df %>%
-  
-  # Rename variables
-  rename(id = yb_lsmh_id) %>%
   
   # Create new variables
   mutate(race_recoded = "...") %>%
@@ -38,8 +40,9 @@ df <- df %>%
 
 
 ####  Analysis  ####
-## Correlations
-cor.test(df$yb_cdi_1, df$yb_cdi_2, method = "spearman")
+## Regression
+my_model <- lm(data = df, yb_cdi_1 ~ yb_cdi_2 + yb_cdi_3)
+summary(my_model)
 
 
 ## Plots
