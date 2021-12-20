@@ -4,6 +4,13 @@
 
 ####  Startup  ####
 ## Load packages
+#<<<<<<< HEAD
+#=======
+
+#>>>>>>> 93743e89665a3964a1507a4248542cd7903bc067
+
+#test comment 12/20
+
 if(!require(tidyverse)){install.packages('tidyverse')}
 if(!require(assertr)){install.packages('assertr')}
 if(!require(here)){install.packages('here')}
@@ -12,14 +19,13 @@ library(tidyverse)
 library(assertr)
 library(here)
 
-
-
 ####  Load Data  ####
 # The here() package returns filepaths based on the arguments you give it,
 # starting from the folder with your .Rproj file; in this case, it will return
 # the filepath to the dataset inside the "data" folder
 # This is especially useful when a script will be run on Windows and Mac 
 # computers, as they use different folder separators ("/" vs "\")
+
 df <- readRDS(here("data", "T2T Data for Jans et al.rds"))
 str(df)
 
