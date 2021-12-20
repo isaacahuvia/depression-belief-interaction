@@ -1,13 +1,9 @@
 ###################
-##  Sample Code  ##
+##  Correct Sample Code  ##
 ###################
 
 ####  Startup  ####
 ## Load packages
-#<<<<<<< HEAD
-#=======
-
-#>>>>>>> 93743e89665a3964a1507a4248542cd7903bc067
 
 #test comment 12/20
 
