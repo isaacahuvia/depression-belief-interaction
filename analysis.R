@@ -64,3 +64,19 @@ summary(my_model_4)
 interaction.plot(x.factor=df_4$yb_cause_brain, trace.factor=df_4$yb_change_brain, response=df_4$yb_permanence)
 
 interaction.plot(x.factor=df_4$yb_cause_env, trace.factor=df_4$yb_change_env, response=df_4$yb_permanence)
+
+## Plots with high and low malleability (more similar to pre-registration)
+
+median_brain_malleability <- median(df_4$yb_change_brain)
+
+median_env_malleability <- median(df_4$yb_change_env)
+
+df_5 <- df_4 %>% mutate(malleability_brain = case_when(yb_change_brain < median_brain_malleability ~ "low", 
+                                                 yb_change_brain > median_brain_malleability ~ "high"))
+
+df_6 <- df_5 %>% mutate(malleability_env = case_when(yb_change_env < median_env_malleability ~ "low", 
+                                                       yb_change_env > median_env_malleability ~ "high"))
+
+interaction.plot(x.factor=df_6$yb_cause_brain, trace.factor=df_6$malleability_brain, response=df_6$yb_permanence)
+
+interaction.plot(x.factor=df_6$yb_cause_env, trace.factor=df_6$malleability_env, response=df_6$yb_permanence)
