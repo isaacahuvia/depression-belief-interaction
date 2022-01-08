@@ -1,0 +1,72 @@
+---
+title: "Regressions In-Depth"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(stargazer)
+
+
+
+#### Load data ####
+df_1 <- readRDS(here("data", "T2T Data for Jans et al.rds"))
+
+
+
+####  Prepare Data  ####
+df_2 <- df_1 %>%
+  
+  # Adding a column for CDI mean
+  mutate(cdi_mean = rowMeans(select(.,contains("cdi")), na.rm = FALSE)) %>%
+  
+  # Selecting variables
+  select(yb_lsmh_id,
+         # Demographic variables
+         pb_childgender, pb_income, pb_childethnicity,
+         # Variables for analysis
+         yb_permanence, yb_cause_brain, yb_cause_env, yb_change_brain, yb_change_env, cdi_mean) %>%
+  
+  # Removing rows containing NA
+  filter(complete.cases(.)) %>%
+  
+  # Standardize numeric variables
+  mutate(across(c(yb_permanence, yb_cause_brain, yb_cause_env, yb_change_brain, yb_change_env, cdi_mean), 
+                scale,
+                .names = "{col}_scaled"))
+```
+
+# Brain Regressions
+
+```{r, results = "asis", echo = F}
+model1 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled)
+model2 <- lm(data = df_2, yb_permanence_scaled ~ yb_change_brain_scaled)
+model3 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled) 
+model4 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled)
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+
+stargazer(model1, model2, model3, model4, model5, type = "html")
+```
+
+The first regression indicates a weak, but significant, relationship between `cause_brain` _(believing depression is caused by one's brain)_ and `permanence` _(believing depression is permanent)_. Specifically, a standard deviation increase in `cause_brain` is associated with a .22 standard deviation increase in `permanence`. Looking at `change_brainv` _(believing one's brain can change to make depression less permanent)_, we see a similar but inverse pattern. 
+
+When we include both `cause_brain` and `change_brain` in the same model, not only do both remain significant, but their coefficients increase; it appears that both (a) `cause_brain` is a stronger predictor of `permanence` when controlling for `change_brain`, and (b) `change_brain` is a stronger predictor of `permanence` when controlling for `cause_brain`. Also look at the R^2; the model with both predictors accounts for 16% of the variance in `permanence`, while on their own the two predictors account for 5% and 6%. The combined model is more powerful than the sum of its parts, which is interesting to me.
+
+Now, to the interaction. It isn't significant. Basically, the data don't indicate that when people believe their brain can change to make depression less permanent, the relationship between believing the brain causes depression and the perceived permanence of depression changes at all. I'm trying to come up with an explanation for why this may be the case despite both predictors being significant on their own. We should talk with Jessica about this.
+
+There are a lot of reasons we might get this result even if the reality of the situation is that people's beliefs _do_ act this way. We have a small sample and rudimentary/non-validated measures. Still, this isn't promising evidence. 
+
+# Environment Regressions
+
+```{r, results = "asis", echo = F}
+model1 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled)
+model2 <- lm(data = df_2, yb_permanence_scaled ~ yb_change_env_scaled)
+model3 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled) 
+model4 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled)
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+
+stargazer(model1, model2, model3, model4, model5, type = "html")
+```
+
+Less to say about these, as even the basic relationships between `change_env` and `permanence` doesn't appear to hold.
