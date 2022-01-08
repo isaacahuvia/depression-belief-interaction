@@ -40,20 +40,6 @@ df_2 <- df_1 %>%
 
 ####  Analysis  ####
 
-## Stepwise regressions just for our reference
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_change_brain_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled) %>% summary()
-
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_change_env_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled) %>% summary()
-lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled) %>% summary()
-
-
 ## Regression with CDI as covariate
 
 my_model_1 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
