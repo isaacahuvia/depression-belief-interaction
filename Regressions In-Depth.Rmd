@@ -123,11 +123,3 @@ ggplot(df_3, aes(yb_change_env)) +  geom_histogram(aes(y=..density..), binwidth 
 ```
 
 Histograms of each variable to ensure that data are normally distributed.
-
-```{r, results = "asis", echo = F}
-df_3 %>%
-  select(yb_cause_brain, yb_change_brain, yb_cause_env, yb_change_env, cdi_mean) %>%
-  cor()
-```
-
-Correlation matrix to check for multicollinearity
