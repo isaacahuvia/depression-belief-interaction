@@ -58,7 +58,7 @@ summary(my_model_4)
 
 ## Plots
 
-interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence)
+interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence, xlab="Belief that depression is caused by the brain", ylab="Belief that depression is permanent", trace.label="Belief that brain can change")
 
 interaction.plot(x.factor=df_2$yb_cause_env, trace.factor=df_2$yb_change_env, response=df_2$yb_permanence)
 
