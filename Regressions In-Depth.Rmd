@@ -70,3 +70,64 @@ stargazer(model1, model2, model3, model4, model5, type = "html")
 ```
 
 Less to say about these, as even the basic relationships between `change_env` and `permanence` doesn't appear to hold.
+
+# Visualizations
+## Interactions
+
+```{r, results = "asis", echo = F}
+interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence,
+                 xlab="Belief that depression is caused by brain", ylab="Belief that depression is permanent", 
+                 trace.label="Brain malleability")
+
+interaction.plot(x.factor=df_2$yb_cause_env, trace.factor=df_2$yb_change_env, response=df_2$yb_permanence,
+                 xlab="Belief that depression is caused by env", ylab="Belief that depression is permanent", 
+                 trace.label="Env malleability")
+
+median_brain_malleability <- median(df_2$yb_change_brain)
+
+median_env_malleability <- median(df_2$yb_change_env)
+
+df_3 <- df_2 %>% mutate(malleability_brain = case_when(yb_change_brain <= median_brain_malleability ~ "low",
+                                                       yb_change_brain > median_brain_malleability ~ "high"),
+                        malleability_env = case_when(yb_change_env <= median_env_malleability ~ "low", 
+                                                     yb_change_env > median_env_malleability ~ "high"))
+
+interaction.plot(x.factor=df_3$yb_cause_brain, trace.factor=df_3$malleability_brain, response=df_3$yb_permanence,
+                 xlab="Belief that depression is caused by brain", ylab="Belief that depression is permanent", 
+                 trace.label="Brain malleability")
+
+interaction.plot(x.factor=df_3$yb_cause_env, trace.factor=df_3$malleability_env, response=df_3$yb_permanence,
+                 xlab="Belief that depression is caused by env", ylab="Belief that depression is permanent", 
+                 trace.label="Env malleability")
+```
+
+The first two visualizations show how the relationship between teens' *beliefs that depression is caused by their brain/environment* and their *beliefs that depression is permanent* differs as a function of *how much they think their brain/environment can change to help depression get better* (1=least malleable; 5=most malleable).  The second two visualizations group teens' beliefs about brain/environment malleability into "high" and "low."  The high malleability group includes teens who gave a response above the median (i.e a score of 4 or 5) and the low malleability group includes teens who gave a response at or below the median (i.e. a score of 1, 2, or 3).
+
+## Histograms
+
+```{r, results = "asis", echo = F, fig.show="hold", out.width="50%"}
+ggplot(df_3, aes(yb_permanence)) +  geom_histogram(aes(y=..density..), binwidth = 1) + ggtitle("Belief that Depression is Permanent") + 
+  stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_permanence), sd = sd(df_3$yb_permanence)), col="red")
+
+ggplot(df_3, aes(yb_cause_brain)) +  geom_histogram(aes(y=..density..), binwidth = 1) + ggtitle("Belief that Depression is Caused by the Brain") + 
+  stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_cause_brain), sd = sd(df_3$yb_cause_brain)), col="red")
+
+ggplot(df_3, aes(yb_cause_env)) +  geom_histogram(aes(y=..density..), binwidth = 1) + ggtitle("Belief that Depression is Caused by the Environment")+ 
+  stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_cause_env), sd = sd(df_3$yb_cause_env)), col="red")
+
+ggplot(df_3, aes(yb_change_brain)) +  geom_histogram(aes(y=..density..), binwidth = 1) + ggtitle("Belief that Brain Can Change") + 
+  stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_change_brain), sd = sd(df_3$yb_change_brain)), col="red")
+
+ggplot(df_3, aes(yb_change_env)) +  geom_histogram(aes(y=..density..), binwidth = 1) + ggtitle("Belief that Environment Can Change") + 
+  stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_change_env), sd = sd(df_3$yb_change_env)), col="red")
+```
+
+Histograms of each variable to ensure that data are normally distributed.
+
+```{r, results = "asis", echo = F}
+df_3 %>%
+  select(yb_cause_brain, yb_change_brain, yb_cause_env, yb_change_env, cdi_mean) %>%
+  cor()
+```
+
+Correlation matrix to check for multicollinearity
