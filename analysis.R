@@ -7,7 +7,8 @@
 library(tidyverse)
 library(here)
 library(ggplot2)
-
+library(sjPlot)
+library(jtools)
 
 
 #### Load data ####
@@ -34,9 +35,12 @@ df_2 <- df_1 %>%
   # Standardize numeric variables
   mutate(across(c(yb_permanence, yb_cause_brain, yb_cause_env, yb_change_brain, yb_change_env, cdi_mean), 
                 scale,
-                .names = "{col}_scaled"))
-
-
+                .names = "{col}_scaled")) %>%
+  
+  # Change class to numeric
+  mutate(across(c(yb_permanence_scaled, yb_cause_brain_scaled, yb_cause_env_scaled, yb_change_brain_scaled, 
+                  yb_change_env_scaled, cdi_mean_scaled), as.numeric))
+  
 
 ####  Analysis  ####
 
@@ -101,7 +105,17 @@ df_3 %>%
   select(yb_cause_brain, yb_change_brain, yb_cause_env, yb_change_env, cdi_mean) %>%
   cor()
 
+## Brain Regression Results
 
+plot_model(my_model_1, type="pred", terms= "yb_cause_brain_scaled")
+plot_model(my_model_1, type="pred", terms= "yb_change_brain_scaled")
+interact_plot(my_model_1, pred= yb_cause_brain_scaled, modx= yb_change_brain_scaled, plot.points = FALSE)
+
+## Environment Regression Results
+
+plot_model(my_model_2, type="pred", terms= "yb_cause_env_scaled")
+plot_model(my_model_2, type="pred", terms= "yb_change_env_scaled")
+interact_plot(my_model_2, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points = FALSE)
 
 #### Summary Statistics ####
 
