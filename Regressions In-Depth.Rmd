@@ -7,8 +7,9 @@ output: html_document
 library(tidyverse)
 library(here)
 library(stargazer)
-
-
+library(ggplot2)
+#library(sjPlot)
+library(interactions)
 
 #### Load data ####
 df_1 <- readRDS(here("data", "T2T Data for Jans et al.rds"))
@@ -47,6 +48,10 @@ model4 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_chan
 model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
 
 stargazer(model1, model2, model3, model4, model5, type = "html")
+
+#plot_model(model5, type="pred", terms= "yb_cause_brain_scaled")
+#plot_model(model5, type="pred", terms= "yb_change_brain_scaled")
+interact_plot(model5, pred= yb_cause_brain_scaled, modx= yb_change_brain_scaled, plot.points = FALSE, interval = TRUE, main.title = "Brain Interaction Controlling for CDI")
 ```
 
 The first regression indicates a weak, but significant, relationship between `cause_brain` _(believing depression is caused by one's brain)_ and `permanence` _(believing depression is permanent)_. Specifically, a standard deviation increase in `cause_brain` is associated with a .22 standard deviation increase in `permanence`. Looking at `change_brainv` _(believing one's brain can change to make depression less permanent)_, we see a similar but inverse pattern. 
@@ -67,11 +72,16 @@ model4 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change
 model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
 
 stargazer(model1, model2, model3, model4, model5, type = "html")
+
+#plot_model(model5, type="pred", terms= "yb_cause_env_scaled")
+#plot_model(model5, type="pred", terms= "yb_change_env_scaled")
+interact_plot(model5, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points= FALSE, interval = TRUE, main.title = "Env Interaction Controlling for CDI")
+interact_plot(model4, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points= FALSE, interval = TRUE, main.title = "Env Interaction Not Controlling for CDI")
 ```
 
-Less to say about these, as even the basic relationships between `change_env` and `permanence` doesn't appear to hold.
+Less to say about these, as even the basic relationships between `change_env` and `permanence` doesn't appear to hold.  The interaction is significant at the p=.1 level, but not when CDI is controlled for.
 
-# Visualizations
+# Additional Visualizations
 ## Interactions
 
 ```{r, results = "asis", echo = F}
