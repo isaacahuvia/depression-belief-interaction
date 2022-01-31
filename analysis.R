@@ -8,7 +8,7 @@ library(tidyverse)
 library(here)
 library(ggplot2)
 library(sjPlot)
-library(jtools)
+library(interactions)
 
 
 #### Load data ####
@@ -62,9 +62,15 @@ summary(my_model_4)
 
 ## Plots
 
-interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence, xlab="Belief that depression is caused by the brain", ylab="Belief that depression is permanent", trace.label="Belief that brain can change")
+interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence, 
+                 xlab="Belief that depression is caused by the brain", 
+                 ylab="Belief that depression is permanent", 
+                 trace.label="Belief that brain can change")
 
-interaction.plot(x.factor=df_2$yb_cause_env, trace.factor=df_2$yb_change_env, response=df_2$yb_permanence)
+interaction.plot(x.factor=df_2$yb_cause_env, trace.factor=df_2$yb_change_env, response=df_2$yb_permanence, 
+                 xlab="Belief that depression is caused by the env", 
+                 ylab="Belief that depression is permanent", 
+                 trace.label="Belief that env can change")
 
 ## Plots grouping permanence variable into high, low, and median malleability 
 #(to create an interaction plot more similar to the pre-registration)
@@ -109,13 +115,14 @@ df_3 %>%
 
 plot_model(my_model_1, type="pred", terms= "yb_cause_brain_scaled")
 plot_model(my_model_1, type="pred", terms= "yb_change_brain_scaled")
-interact_plot(my_model_1, pred= yb_cause_brain_scaled, modx= yb_change_brain_scaled, plot.points = FALSE)
+interact_plot(my_model_1, pred= yb_cause_brain_scaled, modx= yb_change_brain_scaled, plot.points = FALSE, interval = TRUE, main.title = "Brain Interaction Controlling for CDI")
 
 ## Environment Regression Results
 
 plot_model(my_model_2, type="pred", terms= "yb_cause_env_scaled")
 plot_model(my_model_2, type="pred", terms= "yb_change_env_scaled")
-interact_plot(my_model_2, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points = FALSE)
+interact_plot(my_model_2, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points= FALSE, interval = TRUE, main.title = "Env Interaction Controlling for CDI")
+interact_plot(my_model_4, pred= yb_cause_env_scaled, modx= yb_change_env_scaled, plot.points= FALSE, interval = TRUE, main.title = "Env Interaction Not Controlling for CDI")
 
 #### Summary Statistics ####
 
