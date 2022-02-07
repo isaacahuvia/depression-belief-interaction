@@ -1,6 +1,8 @@
 ---
 title: "Regressions In-Depth"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +12,9 @@ library(stargazer)
 library(ggplot2)
 #library(sjPlot)
 library(interactions)
+library(car)
+library(olsrr)
+library(corrplot)
 
 #### Load data ####
 df_1 <- readRDS(here("data", "T2T Data for Jans et al.rds"))
@@ -84,7 +89,7 @@ Less to say about these, as even the basic relationships between `change_env` an
 # Additional Visualizations
 ## Interactions
 
-```{r, results = "asis", echo = F}
+```{r, results = "asis", echo = F, fig.show="hold", out.width="50%"}
 interaction.plot(x.factor=df_2$yb_cause_brain, trace.factor=df_2$yb_change_brain, response=df_2$yb_permanence,
                  xlab="Belief that depression is caused by brain", ylab="Belief that depression is permanent", 
                  trace.label="Brain malleability")
@@ -132,4 +137,103 @@ ggplot(df_3, aes(yb_change_env)) +  geom_histogram(aes(y=..density..), binwidth 
   stat_function(fun=dnorm,args = list(mean = mean(df_3$yb_change_env), sd = sd(df_3$yb_change_env)), col="red")
 ```
 
-Histograms of each variable to ensure that data are normally distributed.
+Histograms of each variable to see if the data are normally distributed.
+
+# Checking Assumptions
+## Multicollinearity
+```{r, results = "asis", echo = F}
+corr_matrix <- df_3 %>%
+  select(yb_cause_brain, yb_change_brain, yb_cause_env, yb_change_env, cdi_mean) %>%
+  cor()
+
+#print(corr_matrix)
+corrplot(corr_matrix, method = 'number')
+```
+
+In the above matrix, there is no correlation coefficient > 0.80, indicating that multicollinearity is not an issue.
+
+## Linearity of Data
+### Brain
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+plot(model5, 1)
+```
+
+### Environment
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+plot(model5, 1)
+```
+
+To meet the assumptions for an OLS regression, there should be a linear relationship between the predictor variables and outcome variables.  This would be indicated by a horizontal line approximately at zero.
+
+## Predictors are Independent
+### Durbin Watson Test
+
+#### Brain
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+durbinWatsonTest(model5)
+```
+
+#### Environment
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+durbinWatsonTest(model5)
+```
+p-values > .05 indicate that predictors are independent of one another.  Our data appears to meat this assumption.
+
+## Constant Variance of Residual Errors
+### Brain
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+plot(model5, 3)
+```
+
+### Environment
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+plot(model5, 3)
+```
+
+### Breusch-Pagan Test
+#### Brain
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+ncvTest(model5)
+```
+
+#### Environment
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+ncvTest(model5)
+```
+I double checked the homoscedasticity assumption using the Breusch-Pagan Test.  The null hypothesis is that the error variances are equal.  Our outcome of p < .05 (or close to it) indicates that our data may not meet this assumption.
+
+## Normality of Residual Errors
+### Q-Q Plot for Brain
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+ols_plot_resid_qq(model5)
+```
+
+### Q-Q Plot for Environment
+```{r, results = "asis", echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+ols_plot_resid_qq(model5)
+```
+
+### Shapiro-Wilk Test
+### Brain
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_brain_scaled + yb_change_brain_scaled + yb_cause_brain_scaled*yb_change_brain_scaled + cdi_mean_scaled)
+ols_test_normality(model5)
+```
+
+### Environment
+```{r, warning = F, echo = F}
+model5 <- lm(data = df_2, yb_permanence_scaled ~ yb_cause_env_scaled + yb_change_env_scaled + yb_cause_env_scaled*yb_change_env_scaled + cdi_mean_scaled)
+ols_test_normality(model5)
+```
+
+The Q-Q plots and outcomes of p > .05 (for the Shapiro-Wilk test) indicate that the residuals are normally distributed, meeting this OLS assumption.
